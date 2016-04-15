@@ -1,0 +1,20 @@
+I.  Introduction
+  a. Group Member Introduction
+  b. Reasons for Choosing the Painter's Algorithm
+
+II. Overview of Algorithm 
+  a. General Idea of the Algorithm
+  b. Common uses / Problems it solves
+  c. Implementation types (CPU vs. GPU, OpenGL vs. C++ vs. Javascript, etc.)
+
+III. Limitations of Algorithm
+  a. Problems with Implementation (e.g. The overlap issues)
+  b. Possible comparisons to the Z-Buffer method
+
+IV. Code Samples
+  a. Present Code samples that we have found
+  b. Present Code samples that we have written (maybe?)
+
+V. Conclusion
+  a. Summary of information covered
+  b. Q & A opportunity
