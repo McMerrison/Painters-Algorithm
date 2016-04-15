@@ -29,3 +29,6 @@ http://www.visualizationlibrary.org/documentation/pag_guide_polygon_depth_sortin
 
 // Psuedocode and Overview of the algorithm
 http://onlinemca.com/mca_course/kurukshetra_university/semester5/computergraphics/painter_algorithm.php
+
+// Overview of GPU / Painter's Algorithm
+http://compsci.hunter.cuny.edu/~sweiss/course_materials/csci360/lecture_notes/gpus.pdf
