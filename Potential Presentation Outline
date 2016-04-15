@@ -10,11 +10,15 @@ II. Overview of Algorithm
 III. Limitations of Algorithm
   a. Problems with Implementation (e.g. The overlap issues)
   b. Possible comparisons to the Z-Buffer method
+  
+IV. Optimizations on Hardware
+  a. Potential CPU optimizations?
+  b. GPU optimizations?
 
-IV. Code Samples
+V. Code Samples
   a. Present Code samples that we have found
   b. Present Code samples that we have written (maybe?)
 
-V. Conclusion
+VI. Conclusion
   a. Summary of information covered
   b. Q & A opportunity
