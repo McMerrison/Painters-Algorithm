@@ -1,0 +1,31 @@
+* From Abstract:
+
+Working Topic: Painter’s algorithm
+https://en.wikipedia.org/wiki/Painter%27s_algorithm
+
+Math stuff (more related to camera POV)
+http://aldream.net/article/2013-04-13-painter-s-algorithm
+
+Some pseudocode (helpful but it’s a forum so idk how we would cite this)
+http://www.experts-exchange.com/questions/27183782/Painter's-Algorithm-Implementation.html
+
+Related solution:
+https://en.wikipedia.org/wiki/Z-buffering 
+
+C code for the algorithm (from Silicon Graphics Inc., somewhat outdated, I believe it’s open source)
+http://www.sv.vt.edu/classes/opengl/examples/depth_buffer/painter.c 
+
+Bunch of C code
+http://www.csee.umbc.edu/~squire/cs437_l9a.html
+
+
+
+
+
+*Found since Abstract
+
+// A C++ implementation of Depth Sorting (another name for the Painter's Algorithm)
+http://www.visualizationlibrary.org/documentation/pag_guide_polygon_depth_sorting.html 
+
+// Psuedocode and Overview of the algorithm
+http://onlinemca.com/mca_course/kurukshetra_university/semester5/computergraphics/painter_algorithm.php
