@@ -36,3 +36,12 @@ http://compsci.hunter.cuny.edu/~sweiss/course_materials/csci360/lecture_notes/gp
 //Javascript implementations (skip down the page or just do a ctrl-f for "painter"):
 http://www.cores2.com/3D_Tutorial/#development-tools-conventions
 http://www.garybeene.com/3d/3d-purejs.htm
+
+//Paper on rendering 3D scene, some info onf Painter's Algorithm
+https://hal-upec-upem.archives-ouvertes.fr/hal-00622389/document
+
+//More detailed description of how GPUs create scenes
+https://www.google.com/patents/US7499051
+
+//OpenGL info article on depth sort
+https://www.opengl.org/wiki/Transparency_Sorting#Depth_Sorting
