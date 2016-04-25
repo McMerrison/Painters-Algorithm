@@ -54,3 +54,9 @@ http://www.geforce.com/hardware/desktop-gpus/geforce-gtx-970/specifications
 
 // Basic OpenGL on opening window, drawing 2D shapes
 http://csclab.murraystate.edu/bob.pilgrim/515/lectures_02.html
+
+// Z-culling (optimization)
+http://developer.amd.com/wordpress/media/2012/10/ShadingCourse2004_EarlyZ.pdf
+
+//Z-fighting (complication)
+http://wiki.step-project.com/Guide:Z-Fighting
