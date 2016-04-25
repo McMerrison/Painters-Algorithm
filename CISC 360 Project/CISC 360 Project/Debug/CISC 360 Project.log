@@ -1,0 +1,11 @@
+﻿  Painters.cpp
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(94): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(95): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(96): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(101): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(102): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(103): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(108): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(109): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\steven\documents\visual studio 2015\projects\cisc 360 project\cisc 360 project\painters.cpp(110): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+  CISC 360 Project.vcxproj -> c:\users\steven\documents\visual studio 2015\Projects\CISC 360 Project\Debug\CISC 360 Project.exe
