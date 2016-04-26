@@ -90,7 +90,7 @@ void drawObject()
 
 	// Yellow
 	glColor3f(1.0, 1.0, 0.0);
-	// First triangle with depth of 0
+	// First triangle with depth of 0.0
 	glVertex3f(0.2, 0.8, 0.0);
 	glVertex3f(0.8, -0.2, 0.0);
 	glVertex3f(-0.8, 0.2, 0.0);
@@ -104,7 +104,7 @@ void drawObject()
 
 	// Green
 	glColor3f(0.0, 1.0, 0.0);
-	// Second triangle with depth of 0
+	// Second triangle with depth of 1.0
 	glVertex3f(0.6, 1.0, 1.0);
 	glVertex3f(0.2, 0.0, 1.0);
 	glVertex3f(-0.8, 0.0, 1.0);
