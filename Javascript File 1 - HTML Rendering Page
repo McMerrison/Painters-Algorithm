@@ -1,0 +1,46 @@
+<html>
+	<!-- Standard head source -->
+	<head>
+		<style type="text/css">
+			body { font-family: Helvetica; }
+		</style>
+		
+		<title>3D Tutorial - Examples</title>
+		<script language="JavaScript" type="application/JavaScript" src="main.js"></script>
+		<script language="JavaScript" type="application/JavaScript" src="source.js"></script>
+	</head>
+	
+	<!-- When the body loads, let us call the main application entry point -->
+	<body onload="Main()">
+		
+		<!-- Center content -->
+		<div style="text-align: center;">
+		
+		<!-- Title -->
+		<img src="CoreS2Logo.png" />
+		<h4>3D Tutorial - Examples</h4>
+		<hr noshade/> <br/>
+		
+		<!-- Canvas Content -->
+		<a href="source.js">
+			<canvas id="SampleCanvas" width="320" height="240">
+				Sorry, but it looks like your browser does not support the Canvas tag.
+			</canvas>
+		</a>
+		<br/>
+		
+		<!-- FPS Counter-->
+		Frames per Second: <input type="text" name="FPSTextBox" id="FPSTextBox" readonly="readonly" size=10 value="Calculating..." />
+		
+		<!-- Footer -->
+		<br/> <br/> <hr noshade/>
+		<div style="font-size: small;">
+			<a href="www.cores2.com" style="text-decoration: none; color: black;">Core S<sup>2</sup> Software Solutions - &copy;2012</a>
+		</div>
+		
+		<!-- End of center -->
+		</div>
+		
+	</body>
+	
+</html>
