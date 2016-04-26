@@ -19,10 +19,9 @@ Bunch of C code
 http://www.csee.umbc.edu/~squire/cs437_l9a.html
 
 
-
-
-
 *Found since Abstract
+//An open source iOS framework for GPU-based image and video processing
+https://github.com/BradLarson/GPUImage
 
 // A C++ implementation of Depth Sorting (another name for the Painter's Algorithm)
 http://www.visualizationlibrary.org/documentation/pag_guide_polygon_depth_sorting.html 
