@@ -59,3 +59,40 @@ http://developer.amd.com/wordpress/media/2012/10/ShadingCourse2004_EarlyZ.pdf
 
 //Z-fighting (complication)
 http://wiki.step-project.com/Guide:Z-Fighting
+
+//Shaders:
+http://www.game-debate.com/news/?news=4788&game=None&title=Graphics%20Card%20Technology%20Part%201:%20Shader%20Processing%20Units
+http://hexus.net/tech/tech-explained/graphics/17992-the-gpu-graphics-processing-unit/
+https://www.youtube.com/watch?v=TDZMSozKZ20
+http://stackoverflow.com/questions/832545/what-are-vertex-and-pixel-shaders
+http://www.m2h.nl/files/LiteraturestudyShaders.pdf
+
+//Motion Blurring
+https://www.youtube.com/watch?v=2-84Bfvh0Pc
+http://http.developer.nvidia.com/GPUGems3/gpugems3_ch27.html
+http://john-chapman-graphics.blogspot.com/2013/01/what-is-motion-blur-motion-pictures-are.html
+https://software.intel.com/en-us/blogs/2014/07/15/an-investigation-of-fast-real-time-gpu-based-image-blur-algorithms - possibly too in-depth
+
+//Lighting
+http://http.developer.nvidia.com/GPUGems/gpugems_ch10.html
+http://http.developer.nvidia.com/GPUGems/gpugems_part02.html
+http://http.developer.nvidia.com/GPUGems/gpugems_ch19.html
+
+//Effects of various elements on GPU Performance
+https://helpdesk.flexradio.com/hc/en-us/articles/202118528-What-is-important-in-choosing-a-Video-Graphics-Card-
+http://www.tomshardware.com/reviews/graphics-card-myths,3694-5.html
+
+//Effects of memory bandwidth on GPU Performance
+http://www.gpureview.com/memory-bandwidth-article-356.html
+
+//Effects of clocks on GPU Performance
+http://www.gpureview.com/core-clock-article-354.html
+http://www.gpureview.com/memory-clock-article-355.html
+
+//Effects of memory bus width on GPU Performance
+https://linustechtips.com/main/topic/44197-memory-bus-size-and-how-it-effects-your-vram-usage/
+http://www.techpowerup.com/forums/threads/explain-to-me-how-memory-width-128-192-256-bit-etc-is-related-to-memory-amount.170588/
+http://www.techspot.com/community/topics/memory-size-vs-memory-bus.73182/
+
+//Overclocking
+https://gaming.msi.com/article/need-more-fps-try-overclocking
