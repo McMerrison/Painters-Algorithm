@@ -1,4 +1,4 @@
-class pixel
+class Pixel
 {
   public:
     float r;
