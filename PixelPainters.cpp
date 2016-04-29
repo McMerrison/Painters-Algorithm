@@ -45,6 +45,7 @@ int main()
 	printBuffer(zbuffer);
 	
 	updateBuffer(zbuffer, 20, 40, 20, 40, 1, 0);
+	printf("\n");
 	
 	printBuffer(zbuffer);
 
