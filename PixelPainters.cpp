@@ -14,9 +14,6 @@
 #include <math.h>
 #include <time.h>
 
-//  variables representing the window size
-int width = 50;
-int height = 50;
 
 //Define a Pixel using rgb values
 struct Pixel {
@@ -26,8 +23,8 @@ struct Pixel {
 typedef Pixel Pixel;
 
 void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth);
-void updateBufferRandom(Pixel *zbuffer, int maxWidth, int maxHeight);
-void printBuffer(Pixel *zbuffer);
+void updateBufferRandom(Pixel *zbuffer, int maxWidth);
+void printBuffer(Pixel *zbuffer, int width);
 float genRandom();
 
 int main()
@@ -35,9 +32,12 @@ int main()
 	
 	clock_t start, end;
 	
+	//Number of times the zbuffer is to be updated
+	int fps = 60;
+	
 	//Only change this number to increase number of iterations
 	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 4;
+	int iterations = 3;
 	int max = pow(10, iterations);
 	//Use varying dimensions (w x w)
 	for (int w = 10; w <= max; w *= 10) {
@@ -48,8 +48,8 @@ int main()
 		Pixel *zbuffer = new Pixel[w*w];
 		
 		//Initilaize depth values at 1 (furthest) and color to 0
-		for (int i = 0; i < width; i ++) {
-			for (int j = 0; j < height; j++) {
+		for (int i = 0; i < w; i ++) {
+			for (int j = 0; j < w; j++) {
 				zbuffer[i*j].color = 0;
 				zbuffer[i*j].depth = 1; 
 			}
@@ -57,13 +57,26 @@ int main()
 		
 		start = clock();
 		
+		//Before, should be array of all zeros
+		if (iterations < 3) {
+			printBuffer(zbuffer, w); 
+		}
+		
 		//Simulates a stream of input data to zbuffer for new polygons
-		updateBufferRandom(zbuffer, w, w);
+		//Updates 'fps' number of frames
+		for (int b = 0; b < fps; b++) {
+			updateBufferRandom(zbuffer, w);
+		}
+		
+		//After, should be array of random numbers (each reprents pixel color)
+		if (iterations < 3) {
+			printBuffer(zbuffer, w); 
+		}
 		
 		end = clock();
 		
 		float diff = (float)(end - start)/CLOCKS_PER_SEC;
-		printf("One frame buffer of size %d x %d took %f seconds to update\n\n", w, w, diff);
+		printf("%d frame buffers of size %d x %d took %f seconds to update\n\n", fps, w, w, diff);
 		//Free the memory after each refresh
 		delete[] zbuffer;
 	}
@@ -71,6 +84,7 @@ int main()
 }
 
 /*
+* NOT USED
 * Uses a nested for loop to set the values for a select set of pixels
 * Starting with the least depth (closest to zbuffer), draw pixels from front to back
 * Update pixel only if it has not been previously defined, then update depth
@@ -99,10 +113,10 @@ void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int
 * This is basically a Reverse Painter's Algorithm
 *
 */
-void updateBufferRandom(Pixel *zbuffer, int maxWidth, int maxHeight)
+void updateBufferRandom(Pixel *zbuffer, int maxWidth)
 {
 	for (int i = 0; i < maxWidth; i ++) {
-		for (int j = 0; j < maxHeight; j++) {
+		for (int j = 0; j < maxWidth; j++) {
 			//For each pixel, generate a random depth and color
 			float depth = genRandom(); // 0 to 1
 			int newc = rand() % 10; //0 to 9, this is arbitrary
@@ -115,9 +129,9 @@ void updateBufferRandom(Pixel *zbuffer, int maxWidth, int maxHeight)
 	}
 }
 
-void printBuffer(Pixel *zbuffer) {
+void printBuffer(Pixel *zbuffer, int width) {
 	for (int i = 0; i < width; i ++) {
-		for (int j = 0; j < height; j++) {
+		for (int j = 0; j < width; j++) {
 			printf("%d", zbuffer[i*j].color);
 		}
 		printf("\n");
