@@ -33,11 +33,11 @@ int main()
 	clock_t start, end;
 	
 	//Number of times the zbuffer is to be updated
-	int fps = 60;
+	int fps = 10;
 	
 	//Only change this number to increase number of iterations
 	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 3;
+	int iterations = 4;
 	int max = pow(10, iterations);
 	//Use varying dimensions (w x w)
 	for (int w = 10; w <= max; w *= 10) {
