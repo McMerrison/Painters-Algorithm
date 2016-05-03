@@ -1,6 +1,6 @@
 ifdef GPU
 CXX := pgc++
-CXXFLAGS := -acc -ta=nvidia,7.5,cc50 -O3 -Minfo
+CXXFLAGS := -acc -ta=nvidia,7.5,cc50 -O3 -Minfo -std=c++11
 SRC := PixelPaintersACC.cpp
 else
 CXX := g++
