@@ -29,7 +29,7 @@ float genRandom();
 
 int main()
 {
-	
+	srand(time(NULL));
 	clock_t start, end;
 	
 	//Number of times the zbuffer is to be updated
@@ -37,7 +37,7 @@ int main()
 	
 	//Only change this number to increase number of iterations
 	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 4;
+	int iterations = 2;
 	int max = pow(10, iterations);
 	//Use varying dimensions (w x w)
 	for (int w = 10; w <= max; w *= 10) {
@@ -139,7 +139,6 @@ void printBuffer(Pixel *zbuffer, int width) {
 }
 
 float genRandom() {
-	srand(time(NULL));
 	int d = rand() % 10;
 	float depth = d/10.0;
 	return depth;

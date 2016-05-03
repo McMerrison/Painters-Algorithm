@@ -1,0 +1,20 @@
+ifdef GPU
+CXX := pgc++
+CXXFLAGS := -acc -ta=tesla,cuda7.5,5.0 -O3
+SRC := PixelPaintersACC.cpp
+else
+CXX := g++
+CXXFLAGS := -O3 -march=native
+SRC := PixelPainters.cpp
+endif
+
+TARGET := $(SRC:.cpp=)
+
+default : $(TARGET)
+
+all :
+	make -C .
+	make -C . GPU=1
+
+clean :
+	-rm -rf PixelPainters PixelPaintersACC
