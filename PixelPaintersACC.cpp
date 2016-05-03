@@ -17,7 +17,10 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include <array>
 #include <openacc.h>
+
+using namespace std;
 
 //Define a Pixel using rgb values
 struct Pixel {
@@ -45,6 +48,11 @@ int main()
 	int max = pow(10, iterations);
 	//Use varying dimensions (w x w)
 	for (int w = 10; w <= max; w *= 10) {
+		
+		std::array<int,w*2> randArray;
+		for(int k = 0;k < randArray.size(); k++) {
+			
+		}
 		
 		//Allocate the array as one-dimensional using width and height
 		//Access can be made by multiplying row by column
@@ -119,7 +127,11 @@ void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int
 */
 void updateBufferRandom(Pixel *zbuffer, int maxWidth)
 {
+	
+	
+	#pragma acc loop
 	for (int i = 0; i < maxWidth; i ++) {
+		#pragma acc loop
 		for (int j = 0; j < maxWidth; j++) {
 			//For each pixel, generate a random depth and color
 			float depth = genRandom(); // 0 to 1
