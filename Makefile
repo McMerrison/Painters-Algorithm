@@ -5,7 +5,7 @@ SRC := PixelPaintersACC.cpp
 else
 CXX := g++
 CXXFLAGS := -O3 -march=native
-SRC := PixelPainters.cpp
+SRC := PixelPaintersSerial.cpp
 endif
 
 TARGET := $(SRC:.cpp=)
