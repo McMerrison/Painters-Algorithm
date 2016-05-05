@@ -1,6 +1,6 @@
 /*
 *
-* Modified by: Talha Ehtasham
+* Modified by: Steven Sell
 * Basic simulation of Painter's Algorithm
 *
 * Creates a "screen" or array of pixels defined by a number and depth
@@ -10,12 +10,13 @@
 */
 
 //COMPILE INSTRUCTIONS//
-//module load pgi64/2016
+//module load pgi64
 //pgc++ -acc PixelPaintersACC.cpp -o PixelPaintersACC
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include <time.h>
 #include <array>
 #include <openacc.h>
@@ -29,8 +30,8 @@ struct Pixel {
 };
 typedef Pixel Pixel;
 
-void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth);
-void updateBufferRandom(Pixel *zbuffer, int maxWidth, int max);
+/*void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth);*/
+void updateBufferRandom(Pixel *zbuffer, int maxWidth, int * randArrL, int * randArrH, int max);
 void printBuffer(Pixel *zbuffer, int width);
 float genRandom1();
 float genRandom2();
@@ -45,8 +46,23 @@ int main()
 	
 	//Only change this number to increase number of iterations
 	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 4;
+	int iterations = 5;
 	int max = pow(10, iterations);
+	
+	int randArrL[max];
+	int randArrH[max];
+	
+	//Generate Random Arrays
+	for(int k = 0;k < max; k++) {
+		randArrL[k] = genRandom1();
+	}
+	for(int k = 0;k < max; k++) {
+		randArrH[k] = genRandom2();
+	}
+	
+	#if _OPENACC
+    acc_init(acc_device_nvidia);
+	#endif
 	
 	//Use varying dimensions (w x w)
 	for (int w = 10; w <= max; w *= 10) {		
@@ -74,7 +90,7 @@ int main()
 		//Simulates a stream of input data to zbuffer for new polygons
 		//Updates 'fps' number of frames
 		for (int b = 0; b < fps; b++) {
-			updateBufferRandom(zbuffer, w, max);
+			updateBufferRandom(zbuffer, w, randArrL, randArrH, max);
 		}
 		
 		//After, should be array of random numbers (each reprents pixel color)
@@ -100,7 +116,7 @@ int main()
 * This is basically a Reverse Painter's Algorithm
 *
 */
-void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth)
+/*void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth)
 {
 	for (int i = minWidth; i < maxWidth; i ++) {
 		for (int j = minHeight; j < maxHeight; j++) {
@@ -112,7 +128,7 @@ void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int
 			}
 		}
 	}
-}
+}*/
 
 /*
 * Uses a nested for loop to set the values for a select set of pixels
@@ -122,34 +138,31 @@ void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int
 * This is basically a Reverse Painter's Algorithm
 *
 */
-void updateBufferRandom(Pixel *zbuffer, int maxWidth, int max)
-{
-	int randArrL[max];
-	int randArrH[max];
-	//Generate Random Array
-	for(int k = 0;k < max; k++) {
-		randArrL[k] = genRandom1();
-	}
-	for(int k = 0;k < max; k++) {
-		randArrH[k] = genRandom2();
-	}
+void updateBufferRandom(Pixel * zbuffer, int maxWidth, int * randArrL, int * randArrH, int max) {
 	int count = 0;
+	int w = maxWidth*maxWidth;
 	
-	#pragma acc loop
+	#pragma acc data copy(randArrL[0:max], randArrH[0:max], zbuffer[0:w]) 
+	{
+	#pragma acc kernels loop independent
 	for (int i = 0; i < maxWidth; i ++) {
-		#pragma acc loop
+		#pragma acc loop independent
 		for (int j = 0; j < maxWidth; j++) {
 			//For each pixel, generate a random depth and color
 			float depth = randArrL[count]; // 0 to 1
 			int newc = randArrH[count]; //0 to 9, this is arbitrary
 			//We can only update if new pixel is in front of the old one
 			if (depth < zbuffer[i*j].depth) {
+				#pragma atomic update
 				zbuffer[i*j].color = newc;
+				#pragma atomic update
 				zbuffer[i*j].depth = depth;
 			}
 			
+			#pragma atomic update
 			count++; //Keeps track of total count for position of random array
 		}
+	}
 	}
 }
 
