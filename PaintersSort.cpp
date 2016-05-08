@@ -1,12 +1,12 @@
 /*
 *
 * Modified by: Talha Ehtasham
-* Basic simulation of Painter's Algorithm
+* Basic simulation of Painter's Algorithm (Depth Checking)
 *
 * Creates a "screen" or array of pixels defined by a number and depth
 * initializes array with number value "0"
-* Updates subsection of array to lower depth (closer) with number "1"
-* Prints before and after images
+* Updates subsection of array to lower depth (closer) with number
+* Prints screen image
 */
 
 #include <unistd.h>
@@ -50,13 +50,13 @@ int main()
 	clock_t start, end;
 	
 	//Number of times the screen is refreshed
-	int fps = 10;
+	int fps = 1;
 	
 	//Dimensions of screen
 	int dim = 100;
 	
 	//Number of Polygons
-	int w = 10;	
+	int w = 5;	
 	
 	//Allocate the array as one-dimensional using width and height
 	//Access can be made by multiplying row by column
@@ -68,8 +68,8 @@ int main()
 	
 	//Initilaize depth values at 1 (furthest) and color at 0
 	for (int z = 0; z < dim*dim; z++) {
-		screen[z].depth = 1;
-		screen[z].color = 0;
+			screen[z].depth = 1.0;
+			screen[z].color = 0;
 	}
 	
 	//Initilaize depth values at 1 (furthest) and color/coordinates at 0
@@ -82,26 +82,27 @@ int main()
 			polygonList[i].coorD = 0;
 	}
 	
-	//printBuffer(screen, dim);
+	
+	
+	start = clock();
+	
 	//Populates list of polygons with random depths
 	for (int b = 0; b < fps; b++) {
 		generatePolygonsRandom(polygonList, w);
-	
+		//printPolys(polygonList, w);
+		//basicSort(polygonList, 0, w-1);	
+		//printPolys(polygonList, w);
 		for (int g = 0; g < w; g++) {
 			drawPolygon(screen, polygonList[g]);
+			printBuffer(screen, dim);
+			usleep(500000);
 		}
-	
-		printBuffer(screen, dim);
-		sleep(1);
 	}
 	
-	//printPolys(polygonList, w);
-	//start = clock();	
-	//basicSort(polygonList, 0, w-1);	
-	//end = clock();
-	//printPolys(polygonList, w);
+	end = clock();
 		
 	float diff = (float)(end - start)/CLOCKS_PER_SEC;
+	//printf("Updating %d polygons on %d frames took %f seconds\n", w, fps, diff);
 	//printf("Sorting a collection of %d \"polygons\" took %f seconds\n", w, diff);
 	//Free the memory after each refresh
 	delete[] polygonList;
@@ -152,6 +153,7 @@ void swap(Polygon *p, int a, int b) {
 }
 
 /*
+* THIS IS WHERE DEPTH COMPARISON HAPPENS
 * Use coordinates of a polygon to draw to screen
 * Draw rows of size "coorA - coorB"
 * Do this "coorC - coodB" times
@@ -159,10 +161,10 @@ void swap(Polygon *p, int a, int b) {
 void drawPolygon(Pixel *screen, Polygon p) {
 	for (int i = p.coorA; i < p.coorB; i++) {
 		for (int j = p.coorC; j < p.coorD; j++) {
-			//if (p.depth < screen[i*j].depth) {
+			if (p.depth < screen[i*j].depth) {
 				screen[i*j].color = p.color;
 				screen[i*j].depth = p.depth;
-			//}
+			}
 		}
 	}
 }
@@ -173,25 +175,40 @@ void drawPolygon(Pixel *screen, Polygon p) {
 */
 void generatePolygonsRandom(Polygon *polygonList, int maxSize)
 {
+	float d = 0.0;
+	int c = 0;
+	int A = 50;
+	int B = 50;
 	for (int i = 0; i < maxSize; i++) {
-		//For each polygon, generate a random depth
+		//For each polygon, generate a random depth and position
 		float depth = genRandom(); // 0 to 1
 		polygonList[i].depth = depth;
-		polygonList[i].color = rand() % 10;
-		polygonList[i].coorA = rand() % 80 + 20;
-		polygonList[i].coorB = rand() % 80 + 20;
-		polygonList[i].coorC = rand() % 80 + 20;
-		polygonList[i].coorD = rand() % 80 + 20;
+		polygonList[i].color = c % 10;
+		polygonList[i].coorA = A;
+		polygonList[i].coorB = B;
+		polygonList[i].coorC = A;
+		polygonList[i].coorD = B;
+		d += 0.1;
+		c += 1;
+		A -= 10;
+		B += 10;
 	}
 }
 
-void printBuffer(Pixel *zbuffer, int size) {
+void printBuffer(Pixel *screen, int size) {
 	for (int i = 0; i < size; i ++) {
 		for (int j = 0; j < size; j++) {
-			printf("%d", zbuffer[i*j].color);
+			printf("%d", screen[i*j].color);
 		}
 		printf("\n");
 	}
+}
+
+void printPolys(Polygon *polygonList, int w) {
+	for (int i = 0; i < w; i++) {
+		printf("%f", polygonList[i].depth);
+	}
+	printf("\n");
 }
 
 float genRandom() {
