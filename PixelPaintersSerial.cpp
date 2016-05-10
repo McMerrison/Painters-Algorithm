@@ -22,11 +22,10 @@ struct Pixel {
 };
 typedef Pixel Pixel;
 
-void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth);
-void updateBufferRandom(Pixel *zbuffer, int maxWidth, int max);
+void updateBufferRandom(int, Pixel *, int, const int*, const float*);
 void printBuffer(Pixel *zbuffer, int width);
 float genRandom1();
-float genRandom2();
+int genRandom2();
 
 int main()
 {
@@ -38,22 +37,29 @@ int main()
 	
 	//Only change this number to increase number of iterations
 	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 5;
-	int max = pow(10, iterations);
+	int iterations = 7;
+	int max = 100*(1 << iterations);
+	
+	int* randArrL = new int[max];
+	float* randArrH = new float[max];
+	
+	//Generate Random Arrays
+	for(int k = 0;k < max; k++) {
+		randArrL[k] = genRandom2();
+		randArrH[k] = genRandom1();
+	}
+	
 	//Use varying dimensions (w x w)
-	for (int w = 10; w <= max; w *= 10) {
+	for (int w = 100; w <= max; w *= 2) {		
 		
 		//Allocate the array as one-dimensional using width and height
 		//Access can be made by multiplying row by column
 		//(i.e. zbuffer[r][c] == zbuffer[r*c])
-		Pixel *zbuffer = new Pixel[w*w];
+		Pixel* zbuffer = new Pixel[w*w];
 		
-		//Initilaize depth values at 1 (furthest) and color to 0
-		for (int i = 0; i < w; i ++) {
-			for (int j = 0; j < w; j++) {
-				zbuffer[i*j].color = 0;
-				zbuffer[i*j].depth = 1; 
-			}
+		//Initialize depth values at 1 (furthest) and color to 0
+		for (int i = 0; i < w*w; i ++) {
+			zbuffer[i] = (Pixel) { 0, 1.0f };
 		}
 		
 		start = clock();
@@ -66,7 +72,7 @@ int main()
 		//Simulates a stream of input data to zbuffer for new polygons
 		//Updates 'fps' number of frames
 		for (int b = 0; b < fps; b++) {
-			updateBufferRandom(zbuffer, w, max);
+			updateBufferRandom(w, zbuffer, max, randArrL, randArrH);
 		}
 		
 		//After, should be array of random numbers (each reprents pixel color)
@@ -81,29 +87,9 @@ int main()
 		//Free the memory after each refresh
 		delete[] zbuffer;
 	}
+	delete[] randArrL;
+	delete[] randArrH;
 
-}
-
-/*
-* NOT USED
-* Uses a nested for loop to set the values for a select set of pixels
-* Starting with the least depth (closest to zbuffer), draw pixels from front to back
-* Update pixel only if it has not been previously defined, then update depth
-* This is basically a Reverse Painter's Algorithm
-*
-*/
-void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth)
-{
-	for (int i = minWidth; i < maxWidth; i ++) {
-		for (int j = minHeight; j < maxHeight; j++) {
-			//Draw if new depth is less than (closer) current depth
-			//Since we draw front to back, each pixel will only be written to a single time
-			if (depth < zbuffer[i*j].depth) {
-				zbuffer[i*j].color = newc;
-				zbuffer[i*j].depth = depth;
-			}
-		}
-	}
 }
 
 /*
@@ -114,36 +100,21 @@ void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int
 * This is basically a Reverse Painter's Algorithm
 *
 */
-void updateBufferRandom(Pixel *zbuffer, int maxWidth, int max)
-{
-	int randArrL[max];
-	int randArrH[max];
-	//Generate Random Array
-	for(int k = 0;k < max; k++) {
-		randArrL[k] = genRandom1();
-	}
-	for(int k = 0;k < max; k++) {
-		randArrH[k] = genRandom2();
-	}
-	int count = 0;
+void updateBufferRandom(int maxWidth, Pixel* zbuffer, int max, const int* randArrL, const float* randArrH) {
 	for (int i = 0; i < maxWidth; i ++) {
 		for (int j = 0; j < maxWidth; j++) {
-			//For each pixel, generate a random depth and color
-			float depth = randArrL[count]; // 0 to 1
-			int newc = randArrH[count]; //0 to 9, this is arbitrary
-			//We can only update if new pixel is in front of the old one
-			if (depth < zbuffer[i*j].depth) {
-				zbuffer[i*j].color = newc;
-				zbuffer[i*j].depth = depth;
+			int count = i*maxWidth+j;
+			if (randArrL[count] < zbuffer[count].depth) {
+				zbuffer[count] = (Pixel) { randArrH[count], randArrL[count] };
 			}
 		}
 	}
 }
 
-void printBuffer(Pixel *zbuffer, int width) {
+void printBuffer(const Pixel *zbuffer, int width) {
 	for (int i = 0; i < width; i ++) {
 		for (int j = 0; j < width; j++) {
-			printf("%d", zbuffer[i*j].color);
+			printf("%d", zbuffer[i*width+j].color);
 		}
 		printf("\n");
 	}
@@ -151,10 +122,10 @@ void printBuffer(Pixel *zbuffer, int width) {
 
 float genRandom1() {
 	int d = rand() % 10;
-	float depth = d/10.0;
+	float depth = d/10.0f;
 	return depth;
 }
 
-float genRandom2() {
-	return (float)(rand() % 10);
+int genRandom2() {
+	return rand() % 10;
 }

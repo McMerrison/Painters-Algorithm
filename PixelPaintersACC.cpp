@@ -20,8 +20,6 @@
 #include <time.h>
 #include <array>
 
-
-
 using namespace std;
 
 //Define a Pixel using rgb values
