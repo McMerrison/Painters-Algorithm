@@ -172,10 +172,10 @@ int main(int argc, char **argv)
 
 	// Define Triangle B
 
-	b.x1 = 288;
+	b.x1 = 216;
 	b.y1 = 384;
 	b.x2 = 384;
-	b.y2 = 216;
+	b.y2 = 264;
 	b.x3 = 432;
 	b.y3 = 1;
 	b.depth = 0.3;
@@ -253,7 +253,16 @@ int main(int argc, char **argv)
 
 	glDrawPixels(480, 480, GL_RGB, GL_FLOAT, g);
 	glutSwapBuffers();
-	system("pause");
+	
+	do{
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+
+	} 
+	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+	glfwWindowShouldClose(window) == 0);
 	
 
 	
