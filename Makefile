@@ -17,4 +17,4 @@ all :
 	make -C . GPU=1
 
 clean :
-	-rm -rf PixelPainters PixelPaintersACC
+	-rm -rf PixelPaintersACC PixelPaintersSerial

@@ -19,6 +19,7 @@
 #include <string.h>
 #include <time.h>
 #include <array>
+#include <chrono>
 
 using namespace std;
 
@@ -31,9 +32,9 @@ typedef Pixel Pixel;
 
 /*void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth);*/
 void updateBufferRandom(int, Pixel *, int, const int*, const float*);
-void printBuffer(Pixel *zbuffer, int width);
-float genRandom1();
-int genRandom2();
+void printBuffer(const Pixel *, int);
+float genRandomH();
+int genRandomL();
 
 int main()
 {
@@ -45,16 +46,17 @@ int main()
 	
 	//Only change this number to increase number of iterations
 	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 7;
+	int iterations = 9;
 	int max = 100*(1 << iterations);
 	
-	int* randArrL = new int[max];
-	float* randArrH = new float[max];
+	int* randArrL = new int[max*max];
+	float* randArrH = new float[max*max];
 	
 	//Generate Random Arrays
-	for(int k = 0;k < max; k++) {
-		randArrL[k] = genRandom2();
-		randArrH[k] = genRandom1();
+	for(int k = 0;k < max*max; k++) {
+		randArrL[k] = genRandomL();
+		randArrH[k] = genRandomH();
+		//printf("%d",randArrL[k]);
 	}
 	
 	//Use varying dimensions (w x w)
@@ -66,16 +68,17 @@ int main()
 		Pixel* zbuffer = new Pixel[w*w];
 		
 		//Initialize depth values at 1 (furthest) and color to 0
+		//#pragma acc kernels copy(zbuffer[w*w]) loop independent
 		for (int i = 0; i < w*w; i ++) {
 			zbuffer[i] = (Pixel) { 0, 1.0f };
 		}
-		
+    
 		start = clock();
 		
 		//Before, should be array of all zeros
-		if (iterations < 3) {
+		/*if (iterations < 2) {
 			printBuffer(zbuffer, w); 
-		}
+		}*/
 		
 		//Simulates a stream of input data to zbuffer for new polygons
 		//Updates 'fps' number of frames
@@ -89,7 +92,6 @@ int main()
 		}
 		
 		end = clock();
-		
 		float diff = (float)(end - start)/CLOCKS_PER_SEC;
 		printf("%d frame buffers of size %d x %d took %f seconds to update\n\n", fps, w, w, diff);
 		//Free the memory after each refresh
@@ -108,15 +110,16 @@ int main()
 *
 */
 void updateBufferRandom(int maxWidth, Pixel* zbuffer, int max, const int* randArrL, const float* randArrH) {
-	#pragma acc kernels copyin(randArrL[max],randArrH[max]) copy(zbuffer[maxWidth*maxWidth]) loop independent
+	#pragma acc kernels copyin(randArrL[max*max],randArrH[max*max]) copy(zbuffer[maxWidth*maxWidth]) loop independent
 	for (int i = 0; i < maxWidth; i ++) {
 		#pragma acc loop independent
 		for (int j = 0; j < maxWidth; j++) {
 			int count = i*maxWidth+j;
-			if (randArrL[count] < zbuffer[count].depth) {
-				zbuffer[count] = (Pixel) { randArrH[count], randArrL[count] };
+			if (randArrH[count] < zbuffer[count].depth) {
+				zbuffer[count] = (Pixel) { randArrL[count], randArrH[count] };
 			}
 		}
+		
 	}
 }
 
@@ -129,12 +132,11 @@ void printBuffer(const Pixel *zbuffer, int width) {
 	}
 }
 
-float genRandom1() {
+float genRandomH() {
 	int d = rand() % 10;
-	float depth = d/10.0f;
-	return depth;
+	return d/10.0f;
 }
 
-int genRandom2() {
+int genRandomL() {
 	return rand() % 10;
 }

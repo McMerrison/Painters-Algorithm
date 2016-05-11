@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include <vector>
 
 
 //Define a Pixel using rgb values
@@ -22,9 +23,8 @@ struct Pixel {
 };
 typedef Pixel Pixel;
 
-void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth);
-void updateBufferRandom(Pixel *zbuffer, int maxWidth);
-void printBuffer(Pixel *zbuffer, int width);
+void updateBufferRandom(std::vector<std::vector<Pixel>> zbuffer, int maxWidth);
+void printBuffer(std::vector<std::vector<Pixel>> zbuffer, int width);
 float genRandom();
 
 int main()
@@ -45,22 +45,23 @@ int main()
 		//Allocate the array as one-dimensional using width and height
 		//Access can be made by multiplying row by column
 		//(i.e. zbuffer[r][c] == zbuffer[r*c])
-		Pixel *zbuffer = new Pixel[w*w];
+		std::vector<std::vector<Pixel>> zbuffer;
+		//Pixel **zbuffer = new Pixel[w][w];
 		
 		//Initilaize depth values at 1 (furthest) and color to 0
 		for (int i = 0; i < w; i ++) {
 			for (int j = 0; j < w; j++) {
-				zbuffer[i*j].color = 0;
-				zbuffer[i*j].depth = 1; 
+				zbuffer[i][j].color = 0;
+				zbuffer[i][j].depth = 1; 
 			}
 		}
 		
 		start = clock();
 		
 		//Before, should be array of all zeros
-		if (iterations < 3) {
+		/*if (iterations < 3) {
 			printBuffer(zbuffer, w); 
-		}
+		}*/
 		
 		//Simulates a stream of input data to zbuffer for new polygons
 		//Updates 'fps' number of frames
@@ -78,31 +79,9 @@ int main()
 		float diff = (float)(end - start)/CLOCKS_PER_SEC;
 		printf("%d frame buffers of size %d x %d took %f seconds to update\n\n", fps, w, w, diff);
 		//Free the memory after each refresh
-		delete[] zbuffer;
+		delete &zbuffer;
 	}
 
-}
-
-/*
-* NOT USED
-* Uses a nested for loop to set the values for a select set of pixels
-* Starting with the least depth (closest to zbuffer), draw pixels from front to back
-* Update pixel only if it has not been previously defined, then update depth
-* This is basically a Reverse Painter's Algorithm
-*
-*/
-void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth)
-{
-	for (int i = minWidth; i < maxWidth; i ++) {
-		for (int j = minHeight; j < maxHeight; j++) {
-			//Draw if new depth is less than (closer) current depth
-			//Since we draw front to back, each pixel will only be written to a single time
-			if (depth < zbuffer[i*j].depth) {
-				zbuffer[i*j].color = newc;
-				zbuffer[i*j].depth = depth;
-			}
-		}
-	}
 }
 
 /*
@@ -113,7 +92,7 @@ void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int
 * This is basically a Reverse Painter's Algorithm
 *
 */
-void updateBufferRandom(Pixel *zbuffer, int maxWidth)
+void updateBufferRandom(std::vector<std::vector<Pixel>> zbuffer, int maxWidth)
 {
 	for (int i = 0; i < maxWidth; i ++) {
 		for (int j = 0; j < maxWidth; j++) {
@@ -121,18 +100,18 @@ void updateBufferRandom(Pixel *zbuffer, int maxWidth)
 			float depth = genRandom(); // 0 to 1
 			int newc = rand() % 10; //0 to 9, this is arbitrary
 			//We can only update if new pixel is in front of the old one
-			if (depth < zbuffer[i*j].depth) {
-				zbuffer[i*j].color = newc;
-				zbuffer[i*j].depth = depth;
+			if (depth < zbuffer[i][j].depth) {
+				zbuffer[i][j].color = newc;
+				zbuffer[i][j].depth = depth;
 			}
 		}
 	}
 }
 
-void printBuffer(Pixel *zbuffer, int width) {
+void printBuffer(std::vector<std::vector<Pixel>> zbuffer, int width) {
 	for (int i = 0; i < width; i ++) {
 		for (int j = 0; j < width; j++) {
-			printf("%d", zbuffer[i*j].color);
+			printf("%d", zbuffer[i][j].color);
 		}
 		printf("\n");
 	}
