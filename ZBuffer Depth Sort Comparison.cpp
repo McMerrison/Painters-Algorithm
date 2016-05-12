@@ -5,8 +5,8 @@
 *
 * Creates a "screen" or array of pixels defined by a number and depth
 * initializes array with number value "0"
-* Updates subsection of array to lower depth (closer) with number "1"
-* Prints before and after images
+* Compares update speed between different array sizes using both random and sorted values
+* Baically a slight modification on PixelPainter.cpp
 */
 
 #include <stdlib.h>
