@@ -23,7 +23,6 @@ struct Pixel {
 };
 typedef Pixel Pixel;
 
-void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth);
 void updateBufferRandom(Pixel *zbuffer, int maxWidth);
 void printBuffer(Pixel *zbuffer, int width);
 float genRandom();
@@ -82,28 +81,6 @@ int main()
 		delete[] zbuffer;
 	}
 
-}
-
-/*
-* NOT USED
-* Uses a nested for loop to set the values for a select set of pixels
-* Starting with the least depth (closest to zbuffer), draw pixels from front to back
-* Update pixel only if it has not been previously defined, then update depth
-* This is basically a Reverse Painter's Algorithm
-*
-*/
-void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth)
-{
-	for (int i = minWidth; i < maxWidth; i ++) {
-		for (int j = minHeight; j < maxHeight; j++) {
-			//Draw if new depth is less than (closer) current depth
-			//Since we draw front to back, each pixel will only be written to a single time
-			if (depth < zbuffer[i*j].depth) {
-				zbuffer[i*j].color = newc;
-				zbuffer[i*j].depth = depth;
-			}
-		}
-	}
 }
 
 /*

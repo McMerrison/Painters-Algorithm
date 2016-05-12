@@ -2,9 +2,11 @@
 * Modified by: Steven Sell
 * Optimized simulation of Painter's Algorithm
 *
-* Creates a "screen" or array of pixels defined by a number and depth
-* initializes array with number value "0"
-* Updates subsection of array to lower depth (closer) with number "1"
+* Creates an array of pixels defined by a Color and Depth
+* Uses a nested for loop to set the values for a select set of pixels
+* Starting with the least depth (closest to zbuffer), draw pixels from front to back
+* Pixel color (int value) and depth (floating point) are generated randomly
+* Update pixel only if it has not been previously defined, then update depth
 * 
 * Base Optimizations:
 * This implementation was developed to further optimize our Painter's Algorithm
@@ -22,7 +24,6 @@
 *
 * In total, we compile three run configurations: Optimized Sequential, OpenMP, and OpenACC.
 */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -30,101 +31,12 @@
 #include <array>
 #include <chrono>
 
-//Define a Pixel using rgb values
+//A Pixel Has A Color And Depth
 struct Pixel {
 	int color;
 	float depth;
 };
 typedef Pixel Pixel;
-
-void printBuffer(const Pixel *, int);
-
-//Only change this number to increase number of iterations
-//For each new iteration multiplies array width and height by 10, initial size is 10x10
-const int iters = 7;
-//Number of times the zbuffer is to be updated
-const int fps = 100;
-const int dim = 100;
-const int max = dim*(1 << iters);
-
-int main()
-{
-	srand(time(NULL));
-	
-	auto randArrC = new int[max][max];
-	auto randArrD = new float[max][max];
-	
-	//Generate Random Arrays
-	for(int j = 0;j < max; j++) {
-		for(int k = 0;k < max; k++) {
-			randArrC[j][k] = (rand() % 10);
-			randArrD[j][k] = (rand() % 10)/10.0f;
-		}
-	}
-	
-	#pragma acc data copyin(randArrC[0:max][0:max],randArrD[0:max][0:max])
-	{
-	//Use varying dimensions (w x w)
-	for (int w = dim; w <= max; w *= 2) {		
-		
-		//Allocate the array as one-dimensional using width and height
-		//Access can be made by multiplying row by column
-		Pixel* zbuffer = new Pixel[w*w];
-		
-		//Initialize depth values at 1 (furthest) and color to 0
-		#pragma acc loop independent
-		for (int i = 0; i < w*w; i ++) {
-			zbuffer[i] = (Pixel) { 0, 1.0f };
-		}
-    
-		std::chrono::time_point <std::chrono::steady_clock> begin, end;
-		
-		//Simulates a stream of input data to zbuffer for new polygons
-		//Updates 'fps' number of frames
-		#pragma acc data copy(zbuffer[0:w*w])
-		{
-		begin = std::chrono::steady_clock::now();
-		for (int b = 0; b < fps; b++) {
-			#pragma acc kernels loop independent copyin(b)
-			for (int i = 0; i < w; i ++) {
-				#pragma acc loop independent
-				for (int j = 0; j < w; j++) {
-					int count = i*w+j;
-					if (randArrD[i][(j+b)%max] < zbuffer[count].depth) {
-						zbuffer[count] = (Pixel) { randArrC[i][(j+b)%max], randArrD[i][(j+b)%max] };
-					}
-				}
-			}
-		}
-		end = std::chrono::steady_clock::now();
-		}
-		
-		//After, should be array of random numbers (each represents pixel color)
-		if (iters < 3) {
-			printBuffer(zbuffer, w); 
-		}
-		
-		double diff = std::chrono::duration <double> { end - begin }.count();
-		printf("%d frame buffers of size %d x %d took %f seconds to update\n", fps, w, w, diff);
-		//Free the memory after each refresh
-		delete[] zbuffer;
-	}
-	}
-	delete[] randArrC;
-	delete[] randArrD;
-}
-
-/*
-* Uses a nested for loop to set the values for a select set of pixels
-* Starting with the least depth (closest to zbuffer), draw pixels from front to back
-* Pixel color (int value) and depth (floating point) are generated randomly
-* Update pixel only if it has not been previously defined, then update depth
-* This is basically a Reverse Painter's Algorithm
-*
-*/
-/*void updateBufferRandom(int maxWidth, Pixel* zbuffer, int max, const int* randArrC, const float* randArrD) {
-	
-}*/
 
 void printBuffer(const Pixel *zbuffer, int width) {
 	for (int i = 0; i < width; i ++) {
@@ -133,4 +45,78 @@ void printBuffer(const Pixel *zbuffer, int width) {
 		}
 	}
 }
+
+const int ITERS = 7; //Number Of Iterations (with increasing array sizes each)
+const int FPS = 100; //Number Of Frame Updates For The zbuffer
+const int DIM = 100; //Initial Dimension For Array Size
+const int MAX = DIM * (1 << ITERS); //Max Array Size Based On Dimension And Number Of Iterations
+
+int main() {
+	srand(time(NULL));
+	auto randArrC = new int[MAX][MAX];
+	auto randArrD = new float[MAX][MAX];
+	
+	//Generate Random Arrays for Color and Depth
+	for(int j = 0;j < MAX; j++) {
+		for(int k = 0;k < MAX; k++) {
+			randArrC[j][k] = (rand() % 10);
+			randArrD[j][k] = (rand() % 10)/10.0f;
+		}
+	}
+	
+	#pragma acc data copyin(randArrC[0:MAX][0:MAX],randArrD[0:MAX][0:MAX])
+	{
+	//Loop based on Dimension->Max *2
+	for (int w = DIM; w <= MAX; w *= 2) {		
+		
+		//Allocate an array of Pixels
+		Pixel* zbuffer = new Pixel[w*w];
+		
+		//Initialize time tracking
+		std::chrono::time_point <std::chrono::steady_clock> begin, end;
+		
+		//Pass zbuffer CPU->GPU (to be passed back to CPU after)
+		#pragma acc data copy(zbuffer[0:w*w])
+		{
+		//Start tracking time
+		begin = std::chrono::steady_clock::now();
+		//Iterate through frames
+		for (int b = 0; b < FPS; b++) {
+			//Pass current frame CPU->GPU and begin looping through 2D array of Pixels
+			#pragma acc kernels loop independent copyin(b)
+			for (int i = 0; i < w; i ++) {
+				#pragma acc loop independent
+				for (int j = 0; j < w; j++) {
+					int count = i*w+j; //Index to be used
+					//If the random number pulled is less than the depth ...
+					if (randArrD[i][(j+b)%MAX] < zbuffer[count].depth) {
+						//Update the zbuffer with the new random color and depth
+						zbuffer[count] = (Pixel) { randArrC[i][(j+b)%MAX], randArrD[i][(j+b)%MAX] };
+					}
+				}
+			}
+		}
+		//Stop tracking time
+		end = std::chrono::steady_clock::now();
+		}
+		
+		//After, should be array of random numbers (each represents pixel color)
+		if (ITERS < 3) {
+			printBuffer(zbuffer, w); 
+		}
+		
+		//Get the time taken to run
+		double diff = std::chrono::duration <double> { end - begin }.count();
+		printf("%d frame buffers of size %d x %d took %f seconds to update\n", FPS, w, w, diff);
+
+		delete[] zbuffer;
+	}
+	}
+	delete[] randArrC;
+	delete[] randArrD;
+}
+
+
+
+
 
