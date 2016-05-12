@@ -38,13 +38,11 @@ int main()
 	//Number of times the zbuffer is to be updated
 	int fps = 10;
 	
-	//Only change this number to increase number of iterations
-	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 4;
-	int max = pow(10, iterations);
+	
+	int max = 10000;
 	
 	//Use varying dimensions (w x w)
-	for (int w = 10; w <= max; w *= 10) {
+	for (int w = 1000; w <= max; w += 1000) {
 		
 		//Allocate the array as one-dimensional using width and height
 		//Access can be made by multiplying row by column
@@ -74,7 +72,7 @@ int main()
 		//Simulates a stream of input data to zbuffer for new polygons
 		//Updates 'fps' number of frames
 		for (int b = 0; b < fps; b++) {
-			updateBufferRandom(zbuffer, w);
+			updateBufferFromArray(zbuffer, randomPixels, w);
 		}
 		end = clock();
 		float diff = (float)(end - start)/CLOCKS_PER_SEC;
