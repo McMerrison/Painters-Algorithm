@@ -1,18 +1,21 @@
-![GitHub Logo](/img/logo.png)
+<p align="center">
+  <img src="/img/logo.png" alt="Painters Algorithm"/>
+</p>
 									 
-# CISC 360 Project
+<p align="center"> # CISC 360 Project 
+</p>
 
 #### Group Members:
 
-*Steven Sell*  @TheUnCola
+*Steven Sell*
 
-*Talha Ehtasham*  @McMerrison
+*Talha Ehtasham*
 
-*Thomas Cardy*  @tcardy
+*Thomas Cardy*
 
 *Melissa Purdy*
 
-*Estella Aviles*  @eaviles375
+*Estella Aviles*
 
 #### Instructions To Run:
 
