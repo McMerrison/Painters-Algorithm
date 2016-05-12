@@ -21,8 +21,6 @@
 #include <array>
 #include <chrono>
 
-using namespace std;
-
 //Define a Pixel using rgb values
 struct Pixel {
 	int color;
@@ -30,37 +28,38 @@ struct Pixel {
 };
 typedef Pixel Pixel;
 
-void updateBufferRandom(int, Pixel *, int, const int*, const float*);
 void printBuffer(const Pixel *, int);
+
+//Only change this number to increase number of iterations
+//For each new iteration multiplies array width and height by 10, initial size is 10x10
+const int iters = 1;
+//Number of times the zbuffer is to be updated
+const int fps = 100;
+const int dim = 3;
+const int max = dim*(1 << iters);
 
 int main()
 {
 	srand(time(NULL));
-	clock_t start, end;
 	
-	//Number of times the zbuffer is to be updated
-	int fps = 10;
-	
-	//Only change this number to increase number of iterations
-	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 7;
-	int max = 100*(1 << iterations);
-	
-	int* randArrL = new int[max*max];
-	float* randArrH = new float[max*max];
+	auto randArrC = new int[max][max];
+	auto randArrD = new float[max][max];
 	
 	//Generate Random Arrays
-	for(int k = 0;k < max*max; k++) {
-		randArrL[k] = (rand() % 10);
-		randArrH[k] = (rand() % 10)/10.0f;
+	for(int j = 0;j < max; j++) {
+		for(int k = 0;k < max; k++) {
+			randArrC[j][k] = (rand() % 10);
+			randArrD[j][k] = (rand() % 10)/10.0f;
+		}
 	}
 	
+	#pragma acc data copyin(randArrC[0:max][0:max],randArrD[0:max][0:max])
+	{
 	//Use varying dimensions (w x w)
-	for (int w = 100; w <= max; w *= 2) {		
+	for (int w = dim; w <= max; w *= 2) {		
 		
 		//Allocate the array as one-dimensional using width and height
 		//Access can be made by multiplying row by column
-		//(i.e. zbuffer[r][c] == zbuffer[r*c])
 		Pixel* zbuffer = new Pixel[w*w];
 		
 		//Initialize depth values at 1 (furthest) and color to 0
@@ -69,28 +68,41 @@ int main()
 			zbuffer[i] = (Pixel) { 0, 1.0f };
 		}
     
-		start = clock();
+		std::chrono::time_point <std::chrono::steady_clock> begin, end;
 		
 		//Simulates a stream of input data to zbuffer for new polygons
 		//Updates 'fps' number of frames
-		
+		#pragma acc data copy(zbuffer[0:w*w])
+		{
+		begin = std::chrono::steady_clock::now();
 		for (int b = 0; b < fps; b++) {
-			updateBufferRandom(w, zbuffer, max, randArrL, randArrH);
+			#pragma acc kernels loop independent copyin(b)
+			for (int i = 0; i < w; i ++) {
+				#pragma acc loop independent
+				for (int j = 0; j < w; j++) {
+					int count = i*w+j;
+					if (randArrD[i][(j+b)%max] < zbuffer[count].depth) {
+						zbuffer[count] = (Pixel) { randArrC[i][(j+b)%max], randArrD[i][(j+b)%max] };
+					}
+				}
+			}
+		}
+		end = std::chrono::steady_clock::now();
 		}
 		
-		//After, should be array of random numbers (each reprents pixel color)
-		if (iterations < 3) {
+		//After, should be array of random numbers (each represents pixel color)
+		if (iters < 3) {
 			printBuffer(zbuffer, w); 
 		}
 		
-		end = clock();
-		float diff = (float)(end - start)/CLOCKS_PER_SEC;
+		double diff = std::chrono::duration <double> { end - begin }.count();
 		printf("%d frame buffers of size %d x %d took %f seconds to update\n", fps, w, w, diff);
 		//Free the memory after each refresh
 		delete[] zbuffer;
 	}
-	delete[] randArrL;
-	delete[] randArrH;
+	}
+	delete[] randArrC;
+	delete[] randArrD;
 }
 
 /*
@@ -101,18 +113,9 @@ int main()
 * This is basically a Reverse Painter's Algorithm
 *
 */
-void updateBufferRandom(int maxWidth, Pixel* zbuffer, int max, const int* randArrL, const float* randArrH) {
-	#pragma acc kernels copyin(randArrL[max*max],randArrH[max*max]) copy(zbuffer[maxWidth*maxWidth]) loop independent
-	for (int i = 0; i < maxWidth; i ++) {
-		#pragma acc loop independent
-		for (int j = 0; j < maxWidth; j++) {
-			int count = i*maxWidth+j;
-			if (randArrH[count] < zbuffer[count].depth) {
-				zbuffer[count] = (Pixel) { randArrL[count], randArrH[count] };
-			}
-		}
-	}
-}
+/*void updateBufferRandom(int maxWidth, Pixel* zbuffer, int max, const int* randArrC, const float* randArrD) {
+	
+}*/
 
 void printBuffer(const Pixel *zbuffer, int width) {
 	for (int i = 0; i < width; i ++) {
