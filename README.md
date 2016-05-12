@@ -2,8 +2,7 @@
   <img src="/img/logo.png" alt="Painters Algorithm"/>
 </p>
 									 
-<p align="center"> # CISC 360 Project 
-</p>
+# CISC 360 Project 
 
 #### Group Members:
 
