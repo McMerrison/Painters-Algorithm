@@ -78,7 +78,7 @@ int main()
 		
 		end = clock();
 		float diff = (float)(end - start)/CLOCKS_PER_SEC;
-		printf("%d frame buffers of size %d x %d took %f seconds to update\n\n", fps, w, w, diff);
+		printf("%d frame buffers of size %d x %d took %f seconds to update\n", fps, w, w, diff);
 		//Free the memory after each refresh
 		delete[] zbuffer;
 	}
