@@ -41,7 +41,7 @@ int main()
 	
 	//Only change this number to increase number of iterations
 	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 9;
+	int iterations = 7;
 	int max = 100*(1 << iterations);
 	
 	int* randArrL = new int[max*max];

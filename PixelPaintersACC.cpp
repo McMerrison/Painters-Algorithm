@@ -30,7 +30,6 @@ struct Pixel {
 };
 typedef Pixel Pixel;
 
-/*void updateBuffer(Pixel *zbuffer, int minWidth, int maxWidth, int minHeight, int maxHeight, int newc, float depth);*/
 void updateBufferRandom(int, Pixel *, int, const int*, const float*);
 void printBuffer(const Pixel *, int);
 float genRandomH();
@@ -46,7 +45,7 @@ int main()
 	
 	//Only change this number to increase number of iterations
 	//For each new iteration multiplies array width and height by 10, initial size is 10x10
-	int iterations = 9;
+	int iterations = 7;
 	int max = 100*(1 << iterations);
 	
 	int* randArrL = new int[max*max];
@@ -54,9 +53,8 @@ int main()
 	
 	//Generate Random Arrays
 	for(int k = 0;k < max*max; k++) {
-		randArrL[k] = genRandomL();
-		randArrH[k] = genRandomH();
-		//printf("%d",randArrL[k]);
+		randArrL[k] = (rand() % 10);
+		randArrH[k] = (rand() % 10)/10.0f;
 	}
 	
 	//Use varying dimensions (w x w)
@@ -74,11 +72,6 @@ int main()
 		}
     
 		start = clock();
-		
-		//Before, should be array of all zeros
-		/*if (iterations < 2) {
-			printBuffer(zbuffer, w); 
-		}*/
 		
 		//Simulates a stream of input data to zbuffer for new polygons
 		//Updates 'fps' number of frames
@@ -132,11 +125,3 @@ void printBuffer(const Pixel *zbuffer, int width) {
 	}
 }
 
-float genRandomH() {
-	int d = rand() % 10;
-	return d/10.0f;
-}
-
-int genRandomL() {
-	return rand() % 10;
-}
