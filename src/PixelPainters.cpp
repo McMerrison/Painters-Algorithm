@@ -1,23 +1,32 @@
 /*
-*
 * Modified by: Steven Sell
-* Basic simulation of Painter's Algorithm
+* Optimized simulation of Painter's Algorithm
 *
 * Creates a "screen" or array of pixels defined by a number and depth
 * initializes array with number value "0"
 * Updates subsection of array to lower depth (closer) with number "1"
-* Prints before and after images
+* 
+* Base Optimizations:
+* This implementation was developed to further optimize our Painter's Algorithm
+* approach. We changed variables to constants, have less function calls (and less
+* passing around of data), created an array of random numbers to call instead of 
+* calling a function with rand() every iteration, and we use 2D arrays in a more 
+* efficient manner. With these base optimizations we generate a sequential run
+* configuration.
+*
+* Parallel Optimizations:
+* We also utilize parallel programming (OpenACC and OpenMP) to generate two additional
+* run configurations for testing speed. OpenACC uses cores of the GPU while OpenMP uses
+* CPU cores to run the following code. You can see this by the #pragma declarations for
+* each type.
+*
+* In total, we compile three run configurations: Optimized Sequential, OpenMP, and OpenACC.
 */
-
-//COMPILE INSTRUCTIONS//
-//module load pgi64
-//pgc++ -acc PixelPaintersACC.cpp -o PixelPaintersACC
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <time.h>
 #include <array>
 #include <chrono>
 

@@ -7,13 +7,14 @@
 * initializes array with number value "0"
 * Updates subsection of array to lower depth (closer) with number "1"
 * Prints before and after images
+* 
+* This is our original (Non-Optimized) implementation of the Painter's Algorithm.
 */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-
 
 //Define a Pixel using rgb values
 struct Pixel {

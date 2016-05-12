@@ -4,7 +4,6 @@ ifdef ACC
   CXX := pgc++
   CXXFLAGS := -acc -ta=nvidia,cuda7.5,maxwell,pinned -O3 -Minfo=acc -std=c++11
 else
-  
     TARGET := PixelPaintersSEQ
     CXX := icpc
     CXXFLAGS := -O3 -march=native -std=c++11
@@ -20,7 +19,7 @@ $(TARGET) : $(BIN)
 
 all :
 	make ACC=1
-	
 	make
+	g++ PixelPaintersORIG.cpp -o PixelPaintersORIG
 clean :
-	-rm -rf PixelPaintersACC PixelPaintersSEQ
+	-rm -rf PixelPaintersACC PixelPaintersSEQ PixelPaintersORIG
