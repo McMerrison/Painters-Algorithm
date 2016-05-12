@@ -32,8 +32,6 @@ typedef Pixel Pixel;
 
 void updateBufferRandom(int, Pixel *, int, const int*, const float*);
 void printBuffer(const Pixel *, int);
-float genRandomH();
-int genRandomL();
 
 int main()
 {
@@ -66,7 +64,7 @@ int main()
 		Pixel* zbuffer = new Pixel[w*w];
 		
 		//Initialize depth values at 1 (furthest) and color to 0
-		//#pragma acc kernels copy(zbuffer[w*w]) loop independent
+		#pragma acc loop independent
 		for (int i = 0; i < w*w; i ++) {
 			zbuffer[i] = (Pixel) { 0, 1.0f };
 		}
@@ -75,6 +73,7 @@ int main()
 		
 		//Simulates a stream of input data to zbuffer for new polygons
 		//Updates 'fps' number of frames
+		
 		for (int b = 0; b < fps; b++) {
 			updateBufferRandom(w, zbuffer, max, randArrL, randArrH);
 		}
@@ -112,7 +111,6 @@ void updateBufferRandom(int maxWidth, Pixel* zbuffer, int max, const int* randAr
 				zbuffer[count] = (Pixel) { randArrL[count], randArrH[count] };
 			}
 		}
-		
 	}
 }
 
@@ -121,7 +119,6 @@ void printBuffer(const Pixel *zbuffer, int width) {
 		for (int j = 0; j < width; j++) {
 			printf("%d", zbuffer[i*width+j].color);
 		}
-		printf("\n");
 	}
 }
 
