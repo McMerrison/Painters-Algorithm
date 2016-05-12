@@ -32,10 +32,10 @@ void printBuffer(const Pixel *, int);
 
 //Only change this number to increase number of iterations
 //For each new iteration multiplies array width and height by 10, initial size is 10x10
-const int iters = 1;
+const int iters = 7;
 //Number of times the zbuffer is to be updated
 const int fps = 100;
-const int dim = 3;
+const int dim = 100;
 const int max = dim*(1 << iters);
 
 int main()
