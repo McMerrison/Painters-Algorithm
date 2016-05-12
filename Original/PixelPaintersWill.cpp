@@ -1,18 +1,14 @@
 /*
  *
- * Modified by: Steven Sell
- * Basic simulation of Painter's Algorithm
+ * Modified by: Will Killian 
+ * Basic simulation of Painter's Algorithm (REFERENCE COPY)
  *
  * Creates a "screen" or array of pixels defined by a number and depth
  * initializes array with number value "0"
  * Updates subsection of array to lower depth (closer) with number "1"
  * Prints before and after images
  */
-
-//COMPILE INSTRUCTIONS//
-//module load pgi64
-//pgc++ -acc PixelPaintersACC.cpp -o PixelPaintersACC
-
+ 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -38,8 +34,8 @@ float randDepth();
 int randColor();
 
 const int FPS = 100;
-const int ITERS = 1;
-const int DIM = 3;
+const int ITERS = 7;
+const int DIM = 100;
 const int MAX = DIM*(1 << ITERS);
 
 int main()
@@ -106,7 +102,6 @@ void printBuffer(const Pixel *zbuffer, int width) {
     for (int j = 0; j < width; j++) {
       printf("%d", zbuffer[i*width+j].color);
     }
-    printf("\n");
   }
 }
 
@@ -117,3 +112,4 @@ float randDepth() {
 int randColor() {
   return rand() % 10;
 }
+
