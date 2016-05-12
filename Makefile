@@ -1,20 +1,30 @@
-ifdef GPU
-CXX := pgc++
-CXXFLAGS := -acc -ta=nvidia,7.5,cc50 -O3 -Minfo=acc -std=c++11
-SRC := PixelPaintersACC.cpp
+SRC := PixelPainters.cpp
+ifdef ACC
+  TARGET := PixelPaintersACC
+  CXX := pgc++
+  CXXFLAGS := -acc -ta=nvidia,cuda7.5,maxwell,pinned -O3 -Minfo=acc -std=c++11
 else
-CXX := g++
-CXXFLAGS := -O3 -march=native -std=c++11
-SRC := PixelPaintersSerial.cpp
+  ifdef OMP
+    TARGET := PixelPaintersOMP
+    CXX := icpc
+    CXXFLAGS := -O3 -march=native -std=c++11 -openmp
+  else
+    TARGET := PixelPaintersCPU
+    CXX := icpc
+    CXXFLAGS := -O3 -march=native -std=c++11
+  endif
 endif
 
-TARGET := $(SRC:.cpp=)
+BIN := $(SRC:.cpp=)
 
 default : $(TARGET)
 
-all :
-	make -C .
-	make -C . GPU=1
+$(TARGET) : $(BIN)
+	-mv $(BIN) $(TARGET)
 
+all :
+	make ACC=1
+	make OMP=1
+	make
 clean :
-	-rm -rf PixelPainters PixelPaintersACC
+	-rm -rf PixelPaintersOMP PixelPaintersACC PixelPaintersCPU
