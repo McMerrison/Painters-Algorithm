@@ -20,14 +20,17 @@
 
 Runnable Files Located In `Original` Directory
 
+`PixelPaintersORIG`, `PixelPaintersSEQ`, and `PixelPaintersACC`
+
 Type `make clean && make all` To Compile All Files
 
 Type `./` And The Name Of The Executable You'd Like To Run
 
+`./PixelPaintersORIG` Will Run Our Original Implementation Of The Algorithm (Non-Optimized & Sequential)
+
+`./PixelPaintersSEQ` Will Run A Sequential Implementation Of The Algorithm (Optimized)
+
 `./PixelPaintersACC` Will Run An OpenACC Parallelized & Optimized Implementation Of The Algorithm
-
-`./PixelPaintersSEQ` Will Run A Sequential Implementation Of The Algorithm 
-
 
 ### Be Sure To Take A Look At Our Sources
 
