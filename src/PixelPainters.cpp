@@ -30,18 +30,7 @@
 #include <string.h>
 #include <array>
 #include <chrono>
-
-//A Pixel Has A Color And Depth
-/*struct Pixel {
-	int color;
-	float depth;
-	Pixel (int c, float d)
-    : color (c), depth (d) { }
-	Pixel ()
-    : Pixel (0, 1.0f) { }
-};
-typedef Pixel Pixel;*/
-
+#pragma warning (disable : 3180 )
 void printBuffer(unsigned int *color, int width) {
 	for (int i = 0; i < width; i ++) {
 		for (int j = 0; j < width; j++) {
@@ -54,9 +43,22 @@ const unsigned int ITERS = 7; //Number Of Iterations (with increasing array size
 const unsigned int FPS = 100; //Number Of Frame Updates For The zbuffer
 const unsigned int DIM = 100; //Initial Dimension For Array Size
 const unsigned int MAX = DIM * (1 << ITERS); //Max Array Size Based On Dimension And Number Of Iterations
+float timeSave;
 
-
-int main() {
+int main(int argc, char* argv[]) {
+	if(argc > 1) {
+		if(atoi(argv[1]) == 1) {
+		printf("Frame Buffer: %d \n\n",FPS);
+		
+		printf("ACC Implementation \n");
+		printf("+----------------+---------+ \n");
+		printf("|   Array Size   | Time(s) | \n");
+		}
+	} else {
+		printf("+----------------+---------+ \n");
+		printf("|   Array Size   | Time(s) | \n");
+	}
+	
 	srand(time(NULL));
 	
 	auto randArrC = new int[MAX][MAX];
@@ -75,9 +77,6 @@ int main() {
 	//Loop based on Dimension->Max *2
 	for (unsigned int w = DIM; w <= MAX; w *= 2) {		
 		
-		//Allocate an array of Pixels
-		//Pixel* zbuffer = new Pixel[w*w]();
-		
 		unsigned int * color = new unsigned int[w*w];
 		float * depth = new float[w*w];
 		
@@ -92,15 +91,14 @@ int main() {
 		//Initialize time tracking
 		std::chrono::time_point <std::chrono::steady_clock> begin, end;
 		
-		//Pass zbuffer CPU->GPU (to be passed back to CPU after)
-		//#pragma acc data copy(zbuffer[0:w*w])
+		//Pass Color & Depth CPU->GPU (to be passed back to CPU after)
 		#pragma acc data copy(color[0:w*w],depth[0:w*w])
 		{
 		//Start tracking time
 		begin = std::chrono::steady_clock::now();
 		//Iterate through frames
 		for (unsigned int b = 0; b < FPS; ++b) {
-			//Pass current frame CPU->GPU and begin looping through 2D array of Pixels
+			//Pass current frame CPU->GPU and begin looping through 2D array of Colors/Depths
 			#pragma omp parallel for
 			#pragma acc kernels loop independent copyin(b)
 			for (unsigned int i = 0; i < w; ++i) {
@@ -110,12 +108,12 @@ int main() {
 					//unsigned int count = i*w+j; //Index to be used
 					//If the random number pulled is less than the depth ...
 					if (randArrD[i][(j+b)%MAX] < depth[i*w+j]) {
-						//Update the zbuffer with the new random color and depth
+						//Update the Pixel with the new random color and depth
 						color[i*w+j] = randArrC[i][(j+b)%MAX];
 						depth[i*w+j] = randArrD[i][(j+b)%MAX];
 					}
 					if (randArrD[i][(j+1+b)%MAX] < depth[i*w+j+1]) {
-						//Update the zbuffer with the new random color and depth
+						//Update the Pixel with the new random color and depth
 						color[i*w+j+1] = randArrC[i][(j+1+b)%MAX];
 						depth[i*w+j+1] = randArrD[i][(j+1+b)%MAX];
 					}
@@ -133,13 +131,24 @@ int main() {
 		
 		//Get the time taken to run
 		double diff = std::chrono::duration <double> { end - begin }.count();
-		printf("%d frame buffers of size %d x %d took %f seconds to update\n", FPS, w, w, diff);
-
-		//delete[] zbuffer;
+		
+		//printf("%d frame buffers of size %d x %d took %f seconds to update\n", FPS, w, w, diff);
+		if(w < 1000) {
+			printf("+----------------+---------+ \n");
+			printf("|   %d  X   %d | %.5f | \n", w, w, diff);
+		} else if(w < 10000) {
+			printf("+----------------+---------+ \n");
+			printf("|  %d  X  %d | %.5f | \n", w, w, diff);
+		} else {
+			printf("+----------------+---------+ \n");
+			printf("| %d  X %d | %.5f | \n", w, w, diff);
+		}
+		
 		delete[] color;
 		delete[] depth;
 	}
 	}
+	printf("+----------------+---------+ \n");
 	delete[] randArrC;
 	delete[] randArrD;
 }
