@@ -42,13 +42,13 @@
 };
 typedef Pixel Pixel;*/
 
-/*void printBuffer(const Pixel *zbuffer, int width) {
+void printBuffer(unsigned int *color, int width) {
 	for (int i = 0; i < width; i ++) {
 		for (int j = 0; j < width; j++) {
-			printf("%d", zbuffer[i*width+j].color);
+			printf("%d", color[i*width+j]);
 		}
 	}
-}*/
+}
 
 const unsigned int ITERS = 7; //Number Of Iterations (with increasing array sizes each)
 const unsigned int FPS = 100; //Number Of Frame Updates For The zbuffer
@@ -106,16 +106,19 @@ int main() {
 			for (unsigned int i = 0; i < w; ++i) {
 				#pragma omp simd
 				#pragma acc loop independent
-				for (unsigned int j = 0; j < w; ++j) {
-					int count = i*w+j; //Index to be used
+				for (unsigned int j = 0; j < w; j+=2) {
+					//unsigned int count = i*w+j; //Index to be used
 					//If the random number pulled is less than the depth ...
-					if (randArrD[i][(j+b)%MAX] < depth[i*w+j]/*zbuffer[count].depth*/) {
+					if (randArrD[i][(j+b)%MAX] < depth[i*w+j]) {
 						//Update the zbuffer with the new random color and depth
-						//zbuffer[count] = (Pixel) { randArrC[i][(j+b)%MAX], randArrD[i][(j+b)%MAX] };
 						color[i*w+j] = randArrC[i][(j+b)%MAX];
 						depth[i*w+j] = randArrD[i][(j+b)%MAX];
 					}
-					
+					if (randArrD[i][(j+1+b)%MAX] < depth[i*w+j+1]) {
+						//Update the zbuffer with the new random color and depth
+						color[i*w+j+1] = randArrC[i][(j+1+b)%MAX];
+						depth[i*w+j+1] = randArrD[i][(j+1+b)%MAX];
+					}
 				}
 			}
 		}
@@ -124,9 +127,9 @@ int main() {
 		}
 		
 		//After, should be array of random numbers (each represents pixel color)
-		/*if (ITERS < 3) {
-			printBuffer(zbuffer, w); 
-		}*/
+		if (ITERS < 3) {
+			printBuffer(color, w); 
+		}
 		
 		//Get the time taken to run
 		double diff = std::chrono::duration <double> { end - begin }.count();
