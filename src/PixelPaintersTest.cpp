@@ -33,14 +33,23 @@
 
 //A Pixel Has A Color And Depth
 /*struct Pixel {
-	int color;
-	float depth;
-	Pixel (int c, float d)
-    : color (c), depth (d) { }
-	Pixel ()
-    : Pixel (0, 1.0f) { }
+	int * color;
+	float * depth;
+	
+	Pixel (int w) { 
+		memset(&color,0,w*w);
+		memset(&depth,1.0f,w*w);
+	}
 };
 typedef Pixel Pixel;*/
+
+/*void printBuffer(const int *color, int width) {
+	for (int i = 0; i < width; ++i) {
+		for (int j = 0; j < width; ++j) {
+			printf("%d", color[i*width+j]);
+		}
+	}
+}*/
 
 /*void printBuffer(const Pixel *zbuffer, int width) {
 	for (int i = 0; i < width; i ++) {
@@ -50,21 +59,18 @@ typedef Pixel Pixel;*/
 	}
 }*/
 
-const unsigned int ITERS = 7; //Number Of Iterations (with increasing array sizes each)
-const unsigned int FPS = 100; //Number Of Frame Updates For The zbuffer
-const unsigned int DIM = 100; //Initial Dimension For Array Size
-const unsigned int MAX = DIM * (1 << ITERS); //Max Array Size Based On Dimension And Number Of Iterations
-
+const int ITERS = 7; //Number Of Iterations (with increasing array sizes each)
+const int FPS = 100; //Number Of Frame Updates For The zbuffer
+const int DIM = 100; //Initial Dimension For Array Size
+const int MAX = DIM * (1 << ITERS); //Max Array Size Based On Dimension And Number Of Iterations
 
 int main() {
-	srand(time(NULL));
-	
 	auto randArrC = new int[MAX][MAX];
 	auto randArrD = new float[MAX][MAX];
 	
 	//Generate Random Arrays for Color and Depth
-	for(int j = 0;j < MAX; j++) {
-		for(int k = 0;k < MAX; k++) {
+	for(int j = 0;j < MAX; ++j) {
+		for(int k = 0;k < MAX; ++k) {
 			randArrC[j][k] = (rand() % 10);
 			randArrD[j][k] = (rand() % 10)/10.0f;
 		}
@@ -73,17 +79,19 @@ int main() {
 	#pragma acc data copyin(randArrC[0:MAX][0:MAX],randArrD[0:MAX][0:MAX])
 	{
 	//Loop based on Dimension->Max *2
-	for (unsigned int w = DIM; w <= MAX; w *= 2) {		
+	for (int w = DIM; w <= MAX; w *= 2) {		
 		
 		//Allocate an array of Pixels
-		//Pixel* zbuffer = new Pixel[w*w]();
+		/*Pixel* zbuffer = new Pixel[w*w];
+		memset(zbuffer->color,0,w*w);
+		memset(zbuffer->depth,1.0f,w*w);*/
 		
-		unsigned int * color = new unsigned int[w*w];
+		int * color = new int[w*w];
 		float * depth = new float[w*w];
 		
-		for (unsigned int i = 0; i < w; i ++) {
-			for (unsigned int j = 0; j < w; j++) {
-				unsigned int count = i*w+j;
+		for (int i = 0; i < w; i ++) {
+			for (int j = 0; j < w; j++) {
+				int count = i*w+j;
 				color[count] = 0;
 				depth[count] = 1.0f;
 			}
@@ -93,29 +101,25 @@ int main() {
 		std::chrono::time_point <std::chrono::steady_clock> begin, end;
 		
 		//Pass zbuffer CPU->GPU (to be passed back to CPU after)
-		//#pragma acc data copy(zbuffer[0:w*w])
 		#pragma acc data copy(color[0:w*w],depth[0:w*w])
 		{
 		//Start tracking time
 		begin = std::chrono::steady_clock::now();
 		//Iterate through frames
-		for (unsigned int b = 0; b < FPS; ++b) {
+		for (int b = 0; b < FPS; b++) {
 			//Pass current frame CPU->GPU and begin looping through 2D array of Pixels
-			#pragma omp parallel for
 			#pragma acc kernels loop independent copyin(b)
-			for (unsigned int i = 0; i < w; ++i) {
-				#pragma omp simd
+			for (int i = 0; i < w; i ++) {
 				#pragma acc loop independent
-				for (unsigned int j = 0; j < w; ++j) {
+				for (int j = 0; j < w; j++) {
 					int count = i*w+j; //Index to be used
 					//If the random number pulled is less than the depth ...
-					if (randArrD[i][(j+b)%MAX] < depth[i*w+j]/*zbuffer[count].depth*/) {
+					if (randArrD[i][(j+b)%MAX] < depth[count]) {
 						//Update the zbuffer with the new random color and depth
 						//zbuffer[count] = (Pixel) { randArrC[i][(j+b)%MAX], randArrD[i][(j+b)%MAX] };
-						color[i*w+j] = randArrC[i][(j+b)%MAX];
-						depth[i*w+j] = randArrD[i][(j+b)%MAX];
+						color[count] = randArrC[i][(j+b)%MAX];
+						depth[count] = randArrD[i][(j+b)%MAX];
 					}
-					
 				}
 			}
 		}
@@ -125,7 +129,7 @@ int main() {
 		
 		//After, should be array of random numbers (each represents pixel color)
 		/*if (ITERS < 3) {
-			printBuffer(zbuffer, w); 
+			printBuffer(color, w); 
 		}*/
 		
 		//Get the time taken to run
@@ -135,13 +139,9 @@ int main() {
 		//delete[] zbuffer;
 		delete[] color;
 		delete[] depth;
+		//delete zbuffer;
 	}
 	}
 	delete[] randArrC;
 	delete[] randArrD;
 }
-
-
-
-
-

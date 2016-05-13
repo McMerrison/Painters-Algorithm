@@ -50,8 +50,9 @@ int main()
 		//Initilaize depth values at 1 (furthest) and color to 0
 		for (int i = 0; i < w; i ++) {
 			for (int j = 0; j < w; j++) {
-				zbuffer[i*j].color = 0;
-				zbuffer[i*j].depth = 1; 
+				int count = i*w+j;
+				zbuffer[count].color = 0;
+				zbuffer[count].depth = 1; 
 			}
 		}
 		
@@ -99,9 +100,10 @@ void updateBufferRandom(Pixel *zbuffer, int maxWidth)
 			float depth = genRandom(); // 0 to 1
 			int newc = rand() % 10; //0 to 9, this is arbitrary
 			//We can only update if new pixel is in front of the old one
-			if (depth < zbuffer[i*j].depth) {
-				zbuffer[i*j].color = newc;
-				zbuffer[i*j].depth = depth;
+			int count = i*maxWidth+j;
+			if (depth < zbuffer[count].depth) {
+				zbuffer[count].color = newc;
+				zbuffer[count].depth = depth;
 			}
 		}
 	}
@@ -110,7 +112,8 @@ void updateBufferRandom(Pixel *zbuffer, int maxWidth)
 void printBuffer(Pixel *zbuffer, int width) {
 	for (int i = 0; i < width; i ++) {
 		for (int j = 0; j < width; j++) {
-			printf("%d", zbuffer[i*j].color);
+			int count = i*width+j;
+			printf("%d", zbuffer[count].color);
 		}
 	}
 }
