@@ -1,12 +1,13 @@
 /*
 *
 * Modified by: Talha Ehtasham
-* Basic simulation of Painter's Algorithm (Depth Checking)
+* Basic simulation of Reverse Painter's Algorithm (Depth Checking)
 *
 * Creates a "screen" or array of pixels defined by a number and depth
 * initializes array with number value "0"
-* Updates subsection of array to lower depth (closer) with number
-* Prints screen image
+* Updates subsection of array using Polygon coordinates
+* Draws blocks of numbers from front to back
+* 
 */
 
 #include <unistd.h>
@@ -111,7 +112,7 @@ int main()
 
 /*
 * Sort the array of polygons using quick sort
-*
+* NOT USED IN THIS FILE. SEE "etc/Zbuffer Depth Sort Comparison" for modified implementation
 */
 void basicSort(Polygon *p, int left, int right) {
 	int half = (left+right)/2;
@@ -170,8 +171,8 @@ void drawPolygon(Pixel *screen, Polygon p) {
 }
 
 /*
-* For each polygon in the list, generate a random depth value
-*
+* For each polygon in the list, generate a depth value, incrementing by 0.1 starting at 0
+* Use "colors" 1-4 and increasing size
 */
 void generatePolygonsRandom(Polygon *polygonList, int maxSize)
 {
@@ -195,6 +196,10 @@ void generatePolygonsRandom(Polygon *polygonList, int maxSize)
 	}
 }
 
+/*
+* Print "screen" array to screen. Used to show how polygons are drawn
+*
+*/
 void printBuffer(Pixel *screen, int size) {
 	for (int i = 0; i < size; i ++) {
 		for (int j = 0; j < size; j++) {
@@ -204,6 +209,10 @@ void printBuffer(Pixel *screen, int size) {
 	}
 }
 
+/*
+* Print depth values of each polygon
+*
+*/
 void printPolys(Polygon *polygonList, int w) {
 	for (int i = 0; i < w; i++) {
 		printf("%f", polygonList[i].depth);
@@ -211,6 +220,10 @@ void printPolys(Polygon *polygonList, int w) {
 	printf("\n");
 }
 
+/*
+* Generate a random depth value from 0.0 to 1.0
+*
+*/
 float genRandom() {
 	int d = rand() % 10;
 	float depth = d/10.0;
