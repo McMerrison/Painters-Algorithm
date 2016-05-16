@@ -98,14 +98,13 @@ int main(int argc, char* argv[]) {
 		begin = std::chrono::steady_clock::now();
 		//Iterate through frames
 		for (unsigned int b = 0; b < FPS; ++b) {
-			//Pass current frame CPU->GPU and begin looping through 2D array of Colors/Depths
+			//Pass current frame CPU->GPU and begin looping through array of Colors/Depths
 			#pragma omp parallel for
 			#pragma acc kernels loop independent copyin(b)
 			for (unsigned int i = 0; i < w; ++i) {
 				#pragma omp simd
 				#pragma acc loop independent
 				for (unsigned int j = 0; j < w; j+=2) {
-					//unsigned int count = i*w+j; //Index to be used
 					//If the random number pulled is less than the depth ...
 					if (randArrD[i][(j+b)%MAX] < depth[i*w+j]) {
 						//Update the Pixel with the new random color and depth
@@ -113,7 +112,6 @@ int main(int argc, char* argv[]) {
 						depth[i*w+j] = randArrD[i][(j+b)%MAX];
 					}
 					if (randArrD[i][(j+1+b)%MAX] < depth[i*w+j+1]) {
-						//Update the Pixel with the new random color and depth
 						color[i*w+j+1] = randArrC[i][(j+1+b)%MAX];
 						depth[i*w+j+1] = randArrD[i][(j+1+b)%MAX];
 					}
@@ -132,7 +130,6 @@ int main(int argc, char* argv[]) {
 		//Get the time taken to run
 		double diff = std::chrono::duration <double> { end - begin }.count();
 		
-		//printf("%d frame buffers of size %d x %d took %f seconds to update\n", FPS, w, w, diff);
 		if(w < 1000) {
 			printf("+----------------+---------+ \n");
 			printf("|   %d  X   %d | %.5f | \n", w, w, diff);
